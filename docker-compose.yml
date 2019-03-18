@@ -2,7 +2,6 @@ version: '3'
 services:
   kafka:
     image: landoop/fast-data-dev
-    network_mode: host
     ports:
     - "2181:2181"
     - "3030:3030"
@@ -18,4 +17,6 @@ services:
       REST_PORT: 8082
       CONNECT_PORT: 8083
       BROKER_PORT: 9092
+      AWS_ACCESS_KEY_ID: AKIAI6N2YRSWTHB7U3OQ
+      AWS_SECRET_ACCESS_KEY: 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
 

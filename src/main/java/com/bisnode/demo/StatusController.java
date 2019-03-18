@@ -1,11 +1,11 @@
 package com.bisnode.demo;
 
-import org.apache.kafka.common.Metric;
-import org.apache.kafka.common.MetricName;
+import org.apache.kafka.streams.KafkaStreams;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.ws.rs.Produces;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -13,17 +13,17 @@ import java.util.stream.Collectors;
 public class StatusController {
 
 
-    private final Map<MetricName, ? extends Metric> metadata;
+    private final List<KafkaStreams> kafkaStreams;
 
-    public StatusController(Map<MetricName, ? extends Metric> metadata) {
-        this.metadata = metadata;
+    public StatusController(List<KafkaStreams> kafkaStreams) {
+        this.kafkaStreams = kafkaStreams;
     }
 
 
     @GetMapping("kafka/metrics")
     @Produces("application/json")
     public Object getMetrics(){
-        return metadata.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().metricValue()));
+        return kafkaStreams.stream()
+                .collect(Collectors.toMap(Object::toString, KafkaStreams::state));
     }
 }

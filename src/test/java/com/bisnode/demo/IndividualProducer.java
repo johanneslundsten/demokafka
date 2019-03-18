@@ -17,15 +17,20 @@ public class IndividualProducer {
     public void produce(){
         Properties props = new Properties();
         props.put("bootstrap.servers", "localhost:9092");
-        Producer<String, String> producer = new KafkaProducer<>(props, new StringSerializer(), new StringSerializer());
+        KafkaProducer<String, Individual> producer = new KafkaProducer<>(props, new StringSerializer(), new IndividualSerializer());
         try {
-            for (int i = 0; i < 100; i++)
-                producer.send(new ProducerRecord<>("danish-individuals", Integer.toString(i), Integer.toString(i)));
+            while (true) {
+                Individual individual = Individual.buildARandom();
+                producer.send(new ProducerRecord<>("individuals", individual.getGedi(), individual));
+                Thread.sleep(200);
+            }
         } catch (ProducerFencedException | OutOfOrderSequenceException | AuthorizationException e) {
             // We can't recover from these exceptions, so our only option is to close the producer and exit.
             producer.close();
         } catch (KafkaException e) {
             // For all other exceptions, just abort the transaction and try again.
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         producer.close();
     }
