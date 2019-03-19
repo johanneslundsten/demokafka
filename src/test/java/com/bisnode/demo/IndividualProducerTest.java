@@ -15,7 +15,7 @@ import org.junit.Test;
 import java.util.Properties;
 
 @Ignore
-public class IndividualProducer {
+public class IndividualProducerTest {
     @Test
     public void produce(){
         Properties props = new Properties();
