@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 @SuppressWarnings({"Duplicates", "unchecked"})
-@Configuration
+//@Configuration
 public class KafkaStreamsConfigCheatSheet {
 
     private IndividualSerde individualSerde = new IndividualSerde();
@@ -32,7 +32,7 @@ public class KafkaStreamsConfigCheatSheet {
     private String kafkaHost;
 
 
-    @Bean
+//    @Bean
     public CreateTopicsResult createTopics() {
         Properties props = new Properties();
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaHost);
@@ -60,7 +60,7 @@ public class KafkaStreamsConfigCheatSheet {
         return result;
     }
 
-    @Bean
+//    @Bean
     public StatusPojo createSimpleStream(CreateTopicsResult result){
         String name = "simple-stream";
 
@@ -81,7 +81,7 @@ public class KafkaStreamsConfigCheatSheet {
         return new StatusPojo(name, streams);
     }
 
-    @Bean
+//    @Bean
     public StatusPojo createBranchStream(CreateTopicsResult result){
         String name = "branch-stream";
 
@@ -122,7 +122,7 @@ public class KafkaStreamsConfigCheatSheet {
         return new StatusPojo(name, streams);
     }
 
-    @Bean
+//    @Bean
     public StatusPojo createMergeStream(CreateTopicsResult result){
         String name = "merge-stream";
 
@@ -147,7 +147,7 @@ public class KafkaStreamsConfigCheatSheet {
         return new StatusPojo(name, streams);
     }
 
-    @Bean
+//    @Bean
     public StatusPojo createJoinStream(CreateTopicsResult result){
 
         Properties props = new Properties();
@@ -174,7 +174,7 @@ public class KafkaStreamsConfigCheatSheet {
         return new StatusPojo(name, streams);
     }
 
-    @Bean
+//    @Bean
     public StatusPojo createAggregateStream(CreateTopicsResult result){
 
         Properties props = new Properties();
