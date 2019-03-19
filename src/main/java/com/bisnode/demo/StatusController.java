@@ -1,6 +1,6 @@
 package com.bisnode.demo;
 
-import com.bisnode.demo.domain.StatusPojo;
+import com.bisnode.demo.domain.StreamWrapper;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
 public class StatusController {
 
 
-    private final List<StatusPojo> kafkaStreams;
+    private final List<StreamWrapper> kafkaStreams;
 
-    public StatusController(List<StatusPojo> kafkaStreams) {
+    public StatusController(List<StreamWrapper> kafkaStreams) {
         this.kafkaStreams = kafkaStreams;
     }
 
@@ -23,6 +23,6 @@ public class StatusController {
     @Produces("application/json")
     public Object getMetrics(){
         return kafkaStreams.stream()
-                .collect(Collectors.toMap(StatusPojo::getName, statusPojo -> statusPojo.getKafkaStreams().state()));
+                .collect(Collectors.toMap(StreamWrapper::getName, statusPojo -> statusPojo.getKafkaStreams().state()));
     }
 }

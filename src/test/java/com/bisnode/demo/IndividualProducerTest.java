@@ -25,7 +25,7 @@ public class IndividualProducerTest {
             while (true) {
                 Individual individual = Individual.buildARandom();
                 producer.send(new ProducerRecord<>("individuals", individual.getGedi(), individual));
-                Thread.sleep(200);
+                Thread.sleep(1000);
             }
         } catch (ProducerFencedException | OutOfOrderSequenceException | AuthorizationException e) {
             // We can't recover from these exceptions, so our only option is to close the producer and exit.
