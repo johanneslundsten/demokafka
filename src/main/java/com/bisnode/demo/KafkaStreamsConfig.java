@@ -1,15 +1,21 @@
 package com.bisnode.demo;
 
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.CreateTopicsResult;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @SuppressWarnings({"Duplicates", "unchecked"})
 @Configuration
@@ -17,14 +23,38 @@ public class KafkaStreamsConfig {
 
     private IndividualSerde individualSerde = new IndividualSerde();
     private HashMapSerde hashMapSerde = new HashMapSerde();
+    @Value("${kafka.host}")
+    private String kafkaHost;
+
 
     @Bean
-    public StatusPojo createSimpleStream(){
+    public CreateTopicsResult createTopics() throws InterruptedException, ExecutionException, TimeoutException {
+        Properties props = new Properties();
+        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaHost);
+        AdminClient adminClient = AdminClient.create(props);
+
+        CreateTopicsResult result = adminClient.createTopics(Arrays.asList(
+                new NewTopic("individuals", 1, (short) 1),
+                new NewTopic("individuals-2", 1, (short) 1),
+                new NewTopic("se-individuals", 1, (short) 1),
+                new NewTopic("dk-individuals", 1, (short) 1),
+                new NewTopic("se-individuals", 1, (short) 1),
+                new NewTopic("se-dk-individuals", 1, (short) 1),
+                new NewTopic("individuals-2", 1, (short) 1)
+        ));
+
+        result.all().get(10, TimeUnit.SECONDS);
+        return result;
+    }
+
+    @Bean
+    public StatusPojo createSimpleStream(CreateTopicsResult result){
         String name = "simple-stream";
 
         Properties props = new Properties();
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, name);
-        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        kafkaHost = kafkaHost;
+        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaHost);
 
         StreamsBuilder builder = new StreamsBuilder();
 
@@ -39,13 +69,13 @@ public class KafkaStreamsConfig {
         return new StatusPojo(name, streams);
     }
 
-//    @Bean
-    public StatusPojo createBranchStream(){
+    @Bean
+    public StatusPojo createBranchStream(CreateTopicsResult result){
         String name = "branch-stream";
 
         Properties props = new Properties();
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, name);
-        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaHost);
 
         props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, individualSerde.getClass().getName());
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
@@ -80,13 +110,13 @@ public class KafkaStreamsConfig {
         return new StatusPojo(name, streams);
     }
 
-//    @Bean
-    public StatusPojo createMergeStream(){
+    @Bean
+    public StatusPojo createMergeStream(CreateTopicsResult result){
         String name = "merge-stream";
 
         Properties props = new Properties();
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, name);
-        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaHost);
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, individualSerde.getClass().getName());
 
@@ -105,13 +135,13 @@ public class KafkaStreamsConfig {
         return new StatusPojo(name, streams);
     }
 
-//    @Bean
-    public StatusPojo createJoinStream(){
+    @Bean
+    public StatusPojo createJoinStream(CreateTopicsResult result){
 
         Properties props = new Properties();
         String name = "join-stream";
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, name);
-        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaHost);
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, individualSerde.getClass().getName());
 
@@ -133,12 +163,12 @@ public class KafkaStreamsConfig {
     }
 
     @Bean
-    public StatusPojo createAggregateStream(){
+    public StatusPojo createAggregateStream(CreateTopicsResult result){
 
         Properties props = new Properties();
         String name = "aggregate-stream";
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, name);
-        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaHost);
         props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, hashMapSerde.getClass().getName());
 
@@ -157,8 +187,9 @@ public class KafkaStreamsConfig {
                 }, (gender, individual, aggregate) -> {
                     aggregate.computeIfPresent(individual.getCountryCode(), (s, integer) -> integer + individual.getAge());
                     return aggregate;
-                }
-                ).toStream().foreach((key, value) -> System.out.println("WINDOW AGES: " + value));
+                })
+                .toStream()
+                .foreach((key, value) -> System.out.println("WINDOW AGES: " + value));
 
 
         builder.build();

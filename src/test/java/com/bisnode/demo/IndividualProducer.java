@@ -8,10 +8,12 @@ import org.apache.kafka.common.errors.AuthorizationException;
 import org.apache.kafka.common.errors.OutOfOrderSequenceException;
 import org.apache.kafka.common.errors.ProducerFencedException;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Properties;
 
+@Ignore
 public class IndividualProducer {
     @Test
     public void produce(){

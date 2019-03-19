@@ -1,13 +1,5 @@
 version: '3'
 services:
-  web:
-    build: .
-    links:
-      - kafka
-    ports:
-      - "8080:8080"
-    command: /scripts/wait-for-it.sh kafka:9092 --timeout=120 --strict -- java -jar -Dspring.profiles.active=docker demo.jar
-
   kafka:
     image: landoop/fast-data-dev
     ports:
@@ -18,12 +10,13 @@ services:
     - "8083:8083"
     - "9092:9092"
     environment:
-      ADV_HOST: kafka
+      ADV_HOST: localhost
       ZK_PORT: 2181
       WEB_PORT: 3030
       REGISTRY_PORT: 8081
       REST_PORT: 8082
       CONNECT_PORT: 8083
       BROKER_PORT: 9092
-      SAMPLEDATA: 0
+#      AWS_ACCESS_KEY_ID: AKIAI6N2YRSWTHB7U3OQ
+#      AWS_SECRET_ACCESS_KEY: jYmCVplLPRe1bkDG/vwoRML22pAKl4cbQsyhZurQ
 
