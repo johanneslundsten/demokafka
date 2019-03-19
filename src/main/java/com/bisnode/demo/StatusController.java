@@ -13,17 +13,17 @@ import java.util.stream.Collectors;
 public class StatusController {
 
 
-    private final List<KafkaStreams> kafkaStreams;
+    private final List<StatusPojo> kafkaStreams;
 
-    public StatusController(List<KafkaStreams> kafkaStreams) {
+    public StatusController(List<StatusPojo> kafkaStreams) {
         this.kafkaStreams = kafkaStreams;
     }
 
 
-    @GetMapping("kafka/metrics")
+    @GetMapping("kafka/status")
     @Produces("application/json")
     public Object getMetrics(){
         return kafkaStreams.stream()
-                .collect(Collectors.toMap(Object::toString, KafkaStreams::state));
+                .collect(Collectors.toMap(StatusPojo::getName, statusPojo -> statusPojo.getKafkaStreams().state()));
     }
 }

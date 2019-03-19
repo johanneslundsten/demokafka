@@ -17,7 +17,7 @@ public class IndividualProducer {
     public void produce(){
         Properties props = new Properties();
         props.put("bootstrap.servers", "localhost:9092");
-        KafkaProducer<String, Individual> producer = new KafkaProducer<>(props, new StringSerializer(), new IndividualSerializer());
+        KafkaProducer<String, Individual> producer = new KafkaProducer<>(props, new StringSerializer(), new IndividualSerde().serializer());
         try {
             while (true) {
                 Individual individual = Individual.buildARandom();
