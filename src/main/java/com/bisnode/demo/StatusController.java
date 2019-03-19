@@ -1,12 +1,11 @@
 package com.bisnode.demo;
 
-import org.apache.kafka.streams.KafkaStreams;
+import com.bisnode.demo.domain.StatusPojo;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.ws.rs.Produces;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController

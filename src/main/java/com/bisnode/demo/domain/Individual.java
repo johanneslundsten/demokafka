@@ -1,4 +1,4 @@
-package com.bisnode.demo;
+package com.bisnode.demo.domain;
 
 import java.util.Random;
 import java.util.UUID;

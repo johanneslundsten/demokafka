@@ -1,8 +1,13 @@
 package com.bisnode.demo;
 
+import com.bisnode.demo.domain.HashMapSerde;
+import com.bisnode.demo.domain.Individual;
+import com.bisnode.demo.domain.IndividualSerde;
+import com.bisnode.demo.domain.StatusPojo;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.CreateTopicsResult;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.common.errors.TopicExistsException;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -43,7 +48,15 @@ public class KafkaStreamsConfig {
                 new NewTopic("individuals-2", 1, (short) 1)
         ));
 
-        result.all().get(10, TimeUnit.SECONDS);
+        result.values().forEach((s, future) -> {
+            try {
+                future.get(10, TimeUnit.SECONDS);
+            } catch (TopicExistsException ignore) {
+            } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                e.printStackTrace();
+            }
+        });
+
         return result;
     }
 

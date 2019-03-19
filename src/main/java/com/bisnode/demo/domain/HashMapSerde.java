@@ -1,4 +1,4 @@
-package com.bisnode.demo;
+package com.bisnode.demo.domain;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
